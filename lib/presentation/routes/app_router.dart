@@ -10,6 +10,7 @@ import '../onboarding/onboarding_screen.dart';
 import '../orders/orders_screen.dart';
 import '../product/product_details_screen.dart';
 import '../splash/splash_screen.dart';
+import '../../domain/entities/product.dart';
 
 GoRouter buildRouter() {
   return GoRouter(
@@ -33,7 +34,10 @@ GoRouter buildRouter() {
       ),
       GoRoute(
         path: '/product',
-        builder: (context, state) => const ProductDetailsScreen(),
+        builder: (context, state) {
+          final product = state.extra as Product;
+          return ProductDetailsScreen(product: product);
+        },
       ),
       GoRoute(
         path: '/cart',

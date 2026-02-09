@@ -1,29 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/entities/product.dart';
+import '../cart/cart_provider.dart';
 
-class ProductDetailsScreen extends StatelessWidget {
-  const ProductDetailsScreen({super.key});
+class ProductDetailsScreen extends ConsumerWidget {
+  final Product product;
+
+  const ProductDetailsScreen({super.key, required this.product});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('পণ্যের বিস্তারিত')),
+      appBar: AppBar(title: Text(product.nameBn)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('পণ্যের নাম', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            if (product.imageUrl != null)
+              Image.network(
+                product.imageUrl!,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            const SizedBox(height: 16),
+            Text(
+              product.nameBn,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Text(
+              '৳${product.price}',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: Colors.green),
+            ),
             const SizedBox(height: 8),
-            const Text('ওজন: ১ কেজি'),
-            const Text('দাম: ৳২৫০'),
-            const Text('প্রত্যাশিত ডেলিভারি: শুক্রবার'),
-            const SizedBox(height: 12),
-            const Text('ব্যাচ নিয়মাবলি: ব্যাচ কনফার্ম হলে প্রোডাক্ট আনানো হবে।'),
+            Text(
+              '${product.weightKg} কেজি',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 16),
+            Text(product.descriptionBn),
             const Spacer(),
-            ElevatedButton(
-              onPressed: () => context.go('/cart'),
-              child: const Text('কার্টে যোগ করুন'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  ref.read(cartProvider.notifier).addToCart(product);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('কার্টে যুক্ত হয়েছে')),
+                  );
+                },
+                icon: const Icon(Icons.add_shopping_cart),
+                label: const Text('কার্টে যোগ করুন'),
+              ),
             ),
           ],
         ),
